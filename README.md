@@ -1,4 +1,7 @@
 # chat2obs
+Возможность любой графической настройки (если шарить в html, css, js)
+---
+![](https://image.prntscr.com/image/9eWTq83ERr6TXaGJZIB-7Q.png)
 
 ## Подготовка к использованию
 1. Скачать [python](https://www.python.org/downloads/)
