@@ -2,8 +2,10 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO, send
 from time import sleep
 import webbrowser
+import json
+import asyncio
 
-from chats import ChatUnifer, twitch
+from chats import ChatUnifer, ErrorMessage, twitch
 from config import HOST, PORT, TWITCH_CHANNEL
 from utils import change_config_variable
 
@@ -31,12 +33,20 @@ def sock_send(message:str):
         chat = ChatUnifer()
 
         if TWITCH_CHANNEL != '':
-            twitch_chat = twitch.TwitchChat(TWITCH_CHANNEL)
+            twitch_chat = twitch.AnonimTwitchChat(TWITCH_CHANNEL)
             chat.add_chat(twitch_chat)
 
-        chat.connect()
         for message in chat.listen():
-            send(message)
+            if type(message) is ErrorMessage:
+                msg_dict = {
+                    'error': message.text
+                }
+            else:
+                msg_dict = {
+                    'text': message.text,
+                    'author': message.author
+                }
+            send(json.dumps(msg_dict))
 
 
 
