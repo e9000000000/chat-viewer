@@ -3,8 +3,9 @@ import websockets
 import random
 import re
 
+from . import Chat, Message
 
-class Chat():
+class TwitchChat(Chat):
     def __init__(self, channel):
         self.__channel = channel
 
@@ -23,6 +24,9 @@ class Chat():
         if 'PRIVMSG #' in responce:
             return True
         return False
+
+    async def connect(self):
+        pass
 
     async def listen(self):
         username = f'justinfan{random.randrange(10000, 99999)}'
@@ -47,3 +51,6 @@ class Chat():
                     message = re.search(r'(?<= :).*', message).group(0)
 
                     yield f'{author}:{message}'
+
+    async def send_message(self, msg_text):
+        pass

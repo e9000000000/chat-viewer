@@ -3,7 +3,7 @@ from flask_socketio import SocketIO, send
 from time import sleep
 import webbrowser
 
-from chats import ChatListener, twitch
+from chats import ChatUnifer, twitch
 from config import HOST, PORT, TWITCH_CHANNEL
 from utils import change_config_variable
 
@@ -28,14 +28,14 @@ def settings():
 @socketio.on('message')
 def sock_send(message:str):
     if message == 'START':
-        chat = ChatListener()
+        chat = ChatUnifer()
 
         if TWITCH_CHANNEL != '':
-            twitch_chat = twitch.Chat(TWITCH_CHANNEL)
+            twitch_chat = twitch.TwitchChat(TWITCH_CHANNEL)
             chat.add_chat(twitch_chat)
 
+        chat.connect()
         for message in chat.listen():
-            print(message)
             send(message)
 
 
