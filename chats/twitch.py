@@ -9,11 +9,17 @@ class TwitchError(Exception):
     def __init__(self, text):
         self.txt = text
 
-class AnonimTwitchChat(Chat):
-    def __init__(self, channel:str):
+class TwitchChat(Chat):
+    def __init__(self, channel:str, name:str=None, irc:str=None):
         self.__channel = channel
-        self.__user = f'justinfan{random.randrange(10000, 99999)}'
-        self.__irc = 'SCHMOOPIIE'
+        if name is not None and irc is not None:
+            self.__user = name
+            self.__irc = irc
+            self.__is_anonim = False
+        else:
+            self.__user = f'justinfan{random.randrange(10000, 99999)}'
+            self.__irc = 'SCHMOOPIIE'
+            self.__is_anonim = True
         self.__web_socket = None
 
         super().__init__()
@@ -94,4 +100,10 @@ class AnonimTwitchChat(Chat):
     async def send_message(self, msg_text):
         if not self.__is_connected:
             raise TwitchError('Twitch no account to send message')
+
+        if self.__is_anonim:
+            raise TwitchError('cant send message as anonim')
+
+        client_notice = random.randrange(1000000, 320302032)
+        await self.__web_socket.send(f'@client-nonce={client_notice} PRIVMSG #{self.__channel} :{msg_text}')
     

@@ -33,7 +33,7 @@ def sock_send(message:str):
         chat = ChatUnifer()
 
         if TWITCH_CHANNEL != '':
-            twitch_chat = twitch.AnonimTwitchChat(TWITCH_CHANNEL)
+            twitch_chat = twitch.TwitchChat(TWITCH_CHANNEL)
             chat.add_chat(twitch_chat)
 
         for message in chat.listen():
