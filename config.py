@@ -1,3 +1,3 @@
-TWITCH_CHANNEL = '12_15_e6'
+TWITCH_CHANNEL = ''
 HOST = 'localhost'
 PORT = '5111'
