@@ -28,7 +28,7 @@ def settings():
     return render_template('settings.html', current_twitch=TWITCH_CHANNEL)
 
 @socketio.on('message')
-def sock_send(message:str):
+def on_message(message:str):
     if message == 'START':
         chat = ChatUnifer()
 
@@ -47,9 +47,6 @@ def sock_send(message:str):
                     'author': message.author
                 }
             send(json.dumps(msg_dict))
-
-
-
 
 
 if __name__ == '__main__':

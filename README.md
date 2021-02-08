@@ -1,14 +1,17 @@
 # chat2obs
-Возможность любой графической настройки (если шарить в html, css, js)
----
-![](https://image.prntscr.com/image/9eWTq83ERr6TXaGJZIB-7Q.png)
+A simple chat viewer.
+Can be easy customised.
 
-## Подготовка к использованию
-1. Скачать [python](https://www.python.org/downloads/)
-2. Установить дополнительные библиотеки `pip install flask flask-socketio eventlet websockets`
-3. По ссылке `localhost:5111/settings` указать свой канал
+## platforms
+* twitch.tv
 
-## Использование
-1. Запустить `chat_to_obs.py`
-2. Добавить в obs веб браузер с указанием ссылки `localhost:5111`
-3. Приступить к использованию
+# Installation
+1. Install [python](https://www.python.org/downloads/)
+2. Clone `git clone git@github.com:e6000000000/chat2obs.git && cd chat2obs`
+3. Install requirements `pip install -r requirements.txt`
+4. Run `python chat_to_obs.py`
+
+Chat can be accessed from [http://127.0.0.1:5111](http://127.0.0.1:5111) url
+
+# Configuration
+For a first run it open a settings web page. Just type there your twitch channel name.
