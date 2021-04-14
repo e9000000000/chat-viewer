@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chat</title>
+</head>
+<body>
+    <div id="chat" class="chat"></div>
+</body>
+<script>
+function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+}
+
+class Chat {
+    constructor(nick='justinfan1215', irc='SCHMOOPIIE') {
+        this.nick = nick;
+        this.irc = irc;
+        this.ws = null;
+        this.channel = null;
+        this.message_handler = null
+    }
+
+    connect() {
+        this.ws = new WebSocket('wss://irc-ws.chat.twitch.tv/');
+
+        var self = this
+        this.ws.onopen = function(e) {
+            self.ws.send('CAP REQ :twitch.tv/tags twitch.tv/commands');
+            self.ws.send('PASS ' + self.irc);
+            self.ws.send('NICK ' + self.nick);
+            self.ws.send('USER ' + self.nick + ' 8 * :' + self.nick);
+        }
+
+        this.ws.onmessage = function(e) {
+            var message = null;
+
+            if (e.data == 'PING :tmi.twitch.tv\r\n') {
+                self.ws.send('PONG');
+            }
+
+            //if wellcome message
+            if (e.data.match(/^:tmi\.twitch\.tv 001 [^ ]+ :Welcome, GLHF!/)) {
+                message = {
+                    'type': 'server',
+                    'text': 'Connected'
+                };
+            }
+
+            //if join channel
+            var join_result = e.data.match(/:tmi.twitch.tv ROOMSTATE #([^ #]+)$/);
+            if (join_result != null) {
+                var channel_name = join_result[1];
+                message = {
+                    'type': 'server',
+                    'text': 'Joined to ' + channel_name
+                };
+            }
+
+            //if message from user
+            var result = e.data.match(/color=(#?\w*);.*:(\w+)!\w+@\w+\.tmi\.twitch\.tv PRIVMSG #\w+ :(.*)/m);
+            if (result != null) {
+                var color = result[1];
+                var username = result[2];
+                var text = result[3];
+                message = {
+                    'type': 'user',
+                    'username': username,
+                    'text': text,
+                    'color': color
+                };
+            }
+
+            if (message != null && self.message_handler != null) {
+                self.message_handler(message);
+            }
+        }
+    }
+
+    join(channel) {
+        this.channel = channel;
+        var self = this;
+        var old_onopen = this.ws.onopen;
+
+        if (this.ws.readyState){
+            self.ws.send('JOIN #' + channel);
+        }
+        else if (!this.ws.readyState){
+            this.ws.onopen = function(e) {
+                old_onopen(e);
+                self.ws.send('JOIN #' + channel);
+            }
+        }
+    }
+
+    send_message(message) {
+        var client_nonce = getRandomInt(45843874378);
+        this.ws.send('@client-nonce=' + client_nonce + ' PRIVMSG #' + this.channel + ' :' + message);
+    }
+
+    set_message_handler(handler) {
+        //handler should recive one arg - message, which is a dict object
+        this.message_handler = handler;
+    }
+
+}
+
+function message_handler(message) {
+    var message_div = document.createElement('div');
+    var message_text = document.createElement('p');
+    message_text.className = 'text';
+
+    if (message.type == 'server') {
+        message_div.className = 'server_message';
+
+    }
+    if (message.type == 'user') {
+        message_div.className = 'message';
+        var message_author = document.createElement('span');
+        message_author.className = 'author';
+        message_author.style.color = message.color;
+        var message_separator = document.createElement('span');
+        message_separator.className = 'separator';
+
+        message_separator.appendChild(document.createTextNode(''))
+        message_author.appendChild(document.createTextNode(message.username))
+        message_text.appendChild(message_author);
+        message_text.appendChild(message_separator);
+    }
+    
+    message_text.appendChild(document.createTextNode(message.text));
+    message_div.appendChild(message_text);
+    var chat = document.getElementById('chat');
+    chat.insertBefore(message_div, chat.firstChild);
+
+    var url_params = new URLSearchParams(window.location.search);
+    var message_show_time = url_params.get('show_time');
+    setTimeout(function() {
+        message_div.remove()
+    }, message_show_time);
+}
+
+function main() {
+    var chat = new Chat();
+    chat.set_message_handler(message_handler);
+    chat.connect();
+    
+    var url_params = new URLSearchParams(window.location.search);
+    var channel = url_params.get('channel');
+    chat.join(channel);
+}
+
+main();
+</script>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18pt;
+}
+
+body {
+    background-color: #00000000;
+}
+
+.chat {
+    background-color: #00000080;
+    display: flex;
+    flex-direction: column-reverse;
+    max-height: 100vh;
+    max-width: 100vw;
+    overflow: hidden;
+}
+
+.chat > div {
+
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-bottom: 1px;
+}
+
+.message {
+    color: #FAFAFA;
+}
+
+.server_message {
+    color: #808080;
+}
+
+.author {
+    color: crimson;
+}
+
+.text {
+    font-weight: normal;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    word-wrap: break-word;
+}
+
+.separator {
+    margin-right: 12px;
+    color: crimson;
+}
+</style>
+
+</html>

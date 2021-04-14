@@ -1,17 +1,10 @@
-# chat2obs
-A simple chat viewer.
-Can be easy customised.
+# Chat to obs
+Just a simple chat to show it in obs, or something you want to do.
 
-## platforms
-* twitch.tv
-
-# Installation
-1. Install [python](https://www.python.org/downloads/)
-2. Clone `git clone git@github.com:e6000000000/chat2obs.git && cd chat2obs`
-3. Install requirements `pip install -r requirements.txt`
-4. Run `python chat_to_obs.py`
-
-Chat can be accessed from [http://127.0.0.1:5111](http://127.0.0.1:5111) url
-
-# Configuration
-For a first run it open a settings web page. Just type there your twitch channel name.
+## how to use
+just open in browser url
+```
+    file:///path/to/chat.html?channel=channelname&show_time=60000"
+```
+where channelname is twitch channel which chat you want to view,
+and 60000 is time when message will disapear (in miliseconds).
