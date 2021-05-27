@@ -1,10 +1,13 @@
 # Chat to obs
-Just a simple chat to show it in obs, or something you want to do.
+Just a chat to show it in obs, or somewhere else.
+
+![](https://i.imgur.com/VjGNNQX.png)
 
 ## how to use
-just open in browser url
+Paste this url to something that can process it.
 ```
-    file:///path/to/chat.html?channel=channelname&show_time=60000"
+    file:///path/to/chat.html?channel=channelname&show_time=60000
 ```
-where channelname is twitch channel which chat you want to view,
-and 60000 is time when message will disapear (in miliseconds).
+* `/path/to/chat.html` is the path to `chat.html` file
+* `channelname` is the twitch channel which chat you want to see
+* `60000` is the time when message will disapear (in miliseconds)
