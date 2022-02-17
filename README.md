@@ -1,12 +1,13 @@
-# Chat to obs
-Just a chat to show it in obs, or somewhere else.
+# Chat viewer
+Simple a chat viewer to show messages in obs, or somewhere like that.
 
-![](https://i.imgur.com/VjGNNQX.png)
+supported platforms:
+- twitch
 
 ## how to use
-Paste this url to something that can process it.
+Paste this url to any browser.
 ```
-https://raw.githack.com/e9000000000/chat2obs/master/chat.html?channel=CHANNEL_NAME&show_time=60000
+https://raw.githack.com/e9000000000/chat_viewer/master/chat.html?channel={CHANNEL_NAME}&show_time={TIME}
 ```
-* `CHANNEL_NAME` is the twitch channel which chat you want to see
-* `60000` is the time when message will disapear (in miliseconds)
+- `{CHANNEL_NAME}` is the twitch channel which chat you want to see
+- `{TIME}` is the time when message will disapear (in miliseconds)
