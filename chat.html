@@ -12,7 +12,8 @@
 <script>
 var chat = document.getElementById("chat");
 var ws = null;
-var channel = null;
+var twitch = null;
+var goodgame = null;
 var message_show_time = null;
 
 
@@ -52,12 +53,12 @@ function print_message(message) {
 }
 
 
-function connect() {
+function connectTwitch() {
     ws = new WebSocket("wss://irc-ws.chat.twitch.tv/");
 
     ws.onclose = (e) => {
-        print_message({"type": "error", "text": "reconnection..."})
-        connect();
+        print_message({"type": "error", "text": "Twitch reconnection..."})
+        connectTwitch();
     }
 
     ws.onopen = (e) => {
@@ -65,7 +66,7 @@ function connect() {
         ws.send("PASS SCHMOOPIIE");
         ws.send("NICK justinfan1215");
         ws.send("USER justinfan1215 8 * :justinfan1215");
-        ws.send("JOIN #" + channel);
+        ws.send("JOIN #" + twitch);
     }
 
     ws.onmessage = (e) => {
@@ -80,7 +81,7 @@ function connect() {
         if (e.data.match(/^:tmi\.twitch\.tv 001 [^ ]+ :Welcome, GLHF!/)) {
             message = {
                 "type": "debug",
-                "text": "Connected"
+                "text": "Twitch connected"
             };
         }
 
@@ -89,7 +90,7 @@ function connect() {
         if (join_result) {
             message = {
                 "type": "debug",
-                "text": "Joined to " + join_result[1]
+                "text": "Twitch joined " + join_result[1]
             };
         }
 
@@ -111,6 +112,71 @@ function connect() {
 }
 
 
+function connectGoodgame() {
+    var httpRequest = new XMLHttpRequest();
+    httpRequest.open("GET", "https://goodgame.ru/channel/" + goodgame + "/#autoplay", false);
+    httpRequest.send(null);
+    if (httpRequest.status != 200) {
+        print_message({
+            "type": "error",
+            "text": "can't connect to " + goodgame
+        });
+        return;
+    }
+    var channel_id = httpRequest.responseText.match(/\<gg\-channel\-init\-block channel\-id="(\d+)"\>/)[1];
+    ws = new WebSocket("wss://chat-1.goodgame.ru/chat2/");
+
+    ws.onclose = (e) => {
+        print_message({"type": "error", "text": "Goodgame reconnection..."})
+        connectGoodgame();
+    }
+
+    ws.onopen = (e) => {
+        ws.send('{"type":"auth","data":{"user_id":0,"token":""}}');
+        ws.send('{"type":"join","data":{"channel_id":"'+channel_id+'","hidden":0,"reload":false}}');
+        ws.send('{"type":"get_ignore_list","data":{}}');
+        ws.send('{"type":"get_channel_history","data":{"channel_id":"'+channel_id+'","from":0}}');
+        setInterval(() => {
+            ws.send('{"type":"ping","data":{}}');
+        }, 20000);
+    }
+
+    ws.onmessage = (e) => {
+        var msg = JSON.parse(e.data);
+
+        //if auth success
+        if (msg.type == "success_auth") {
+            print_message({
+                "type": "debug",
+                "text": "Goodgame connected"
+            });
+        }
+
+        //if joined
+        if (msg.type == "success_join") {
+            print_message({
+                "type": "debug",
+                "text": "Goodgame joined " + msg.data.channel_streamer.name
+            });
+        }
+
+        //if history
+        if (msg.type == "channel_history") {
+            var messages = msg.data.messages;
+            for (var i in messages) {
+                print_message({
+                    "type": "user",
+                    "username": messages[i].user_name,
+                    "text": messages[i].text,
+                    "color": messages[i].color
+                });
+            }
+        }
+    }
+    
+}
+
+
 function main() {
     var url_params = new URLSearchParams(window.location.search);
     message_show_time = url_params.get("show_time");
@@ -121,14 +187,26 @@ function main() {
             "text": "'show_time' variable is not specified. default is 60000 (60 seconds)"
         })
     }
-    channel = url_params.get('channel');
-    if (!channel) {
+
+    twitch = url_params.get('twitch');
+    if (!twitch) {
         print_message({
             "type": "error",
-            "text": "no 'channel' variable specified. set '?channel=YOUR_CHANNEL_NAME' afret url"
+            "text": "no 'twitch' variable specified. set '?twitch=YOUR_CHANNEL_NAME' afret url"
         })
+    } else {
+        connectTwitch();
     }
-    connect();
+
+    goodgame = url_params.get('goodgame');
+    if (!goodgame) {
+        print_message({
+            "type": "error",
+            "text": "no 'goodgame' variable specified. set '?goodgame=YOUR_CHANNEL_NAME' afret url"
+        })
+    } else {
+        connectGoodgame();
+    }
 }
 
 main();
@@ -147,7 +225,7 @@ body {
 }
 
 .chat {
-    background-color: #00000080;
+    background-color: #00000099;
     display: flex;
     flex-direction: column-reverse;
     max-height: 100vh;
