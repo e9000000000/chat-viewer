@@ -8,7 +8,7 @@ supported platforms:
 ## how to use
 Paste this url to any browser.
 ```
-https://raw.githack.com/e9000000000/chat_viewer/master/chat.html?twitch={TWITCH}&goodgame={GOODGAME}&show_time={TIME}
+https://raw.githack.com/e9000000000/chat-viewer/master/chat.html?twitch={TWITCH}&goodgame={GOODGAME}&show_time={TIME}
 ```
 - `{TWITCH}` is the twitch channel name which chat you want to see
 - `{GOODGAME}` is the goodgame channel name which chat you want to see
