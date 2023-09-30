@@ -21,6 +21,7 @@ var message_show_time = null;
 // message example: {"type": "debug", "text": "sometext"}
 // message example: {"type": "user", "text": "sometext", "color": "#121511", "username": "vova2009"}
 function print_message(message) {
+	console.log(message)
     var messageRoot = document.createElement("div");
     messageRoot.className = "message";
     var messageText = document.createElement("p");
@@ -33,7 +34,10 @@ function print_message(message) {
     } else if (message.type == "user") {
         messageRoot.className += " user-message";
         var messageAuthor = document.createElement("span");
-        messageAuthor.className += "message-author";
+        messageAuthor.className += "message-authoer";
+		if (message.color) {
+			messageAuthor.style.color = message.color
+		}
         var messageSeparator = document.createElement("span");
         messageSeparator.className = "separator";
 
