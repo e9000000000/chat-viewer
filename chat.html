@@ -15,6 +15,7 @@ var ws = null;
 var twitch = null;
 var goodgame = null;
 var message_show_time = null;
+var show_debug_messages = null;
 
 
 // message example: {"type": "error", "text": "error details"}
@@ -22,6 +23,11 @@ var message_show_time = null;
 // message example: {"type": "user", "text": "sometext", "color": "#121511", "username": "vova2009"}
 function print_message(message) {
 	console.log(message)
+
+    if (message.type != "user" && !show_debug_messages) {
+        return
+    }
+
     var messageRoot = document.createElement("div");
     messageRoot.className = "message";
     var messageText = document.createElement("p");
@@ -177,13 +183,13 @@ function connectGoodgame() {
             }
         }
     }
-    
 }
 
 
 function main() {
     var url_params = new URLSearchParams(window.location.search);
     message_show_time = url_params.get("show_time");
+    show_debug_messages = url_params.get("logs") ? true : false;
     if (!message_show_time) {
         message_show_time = 60000;
         print_message({
